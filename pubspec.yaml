@@ -1,0 +1,11 @@
+name: flight
+version: 0.0.1
+description: A modern, lightweight, extensible framework for creating rich APIs in Dart.
+author: BradW Ltd. <developers@bradw.io>
+
+environment:
+  sdk: '>=2.2.0 <3.0.0'
+
+dependencies:
+
+dev_dependencies:
