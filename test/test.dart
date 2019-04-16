@@ -2,17 +2,19 @@ import 'package:flight/flight.dart';
 
 void main() {
   
-  Flight f = Flight();
+  Flight f = Flight(
+    onBound: (port, addr) => print('Listening on ${addr}:${port}'),
+  );
 
-  f.get('/test', () {
-
-  });
-
-  f.post('/test', () {
+  f.get('/test', (req, res) {
 
   });
 
-  f(GET, '/test', () {
+  f.post('/test', (req, res) {
+
+  });
+
+  f(PUT, '/test', (req, res) {
 
   });
 

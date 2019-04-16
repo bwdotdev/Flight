@@ -1,6 +1,7 @@
 part of flight;
 
-typedef RouteHandler = void Function();
+typedef RouteHandler = void Function(Request req, Response res1);
+typedef BoundCallback = void Function(int port, String address);
 
 enum Verb {
   GET, POST, PUT, DELETE,
@@ -19,31 +20,31 @@ class Flight {
     DELETE: {},
   };
 
-  Flight([ int port = 3000, String address = '0.0.0.0' ]) {
+  Flight({ int port = 3000, String address = '0.0.0.0', BoundCallback onBound }) {
     var listenOn = InternetAddress(address);
 
-    HttpServer.bind(listenOn, port).then(this._serverBound);
+    HttpServer.bind(listenOn, port).then(
+      (server) => this._serverBound(server, onBound),
+    );
   }
 
-  _serverBound(HttpServer server) async {
-    print('bound');
+  _serverBound(HttpServer server, BoundCallback onBound) async {
+    if(onBound != null) onBound(server.port, server.address.address);
 
     await for (HttpRequest request in server) {
       var verb = this._getVerb(request.method);
-      var res = request.response;
+      var req = Request(request);
+      var res = Response(request.response);
 
       if(verb == null) {
-        res..write('Unsupported Verb')..close();
+        res.send('Unsupported Verb');
       } else {
         var verbRoutes = this._routes[verb];
 
-        if(!verbRoutes.containsKey(request.uri.path)) {
-          res.statusCode = 404;
-          res..write('Not found')..close();
+        if(!verbRoutes.containsKey(req.path)) {
+          res.status(404).send('Not found');
         } else {
-          request.response
-            ..write(request.uri)
-            ..close();
+          res.send(req.path);
         }
       }
     }
