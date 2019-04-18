@@ -3,13 +3,13 @@ part of flight;
 class Request {
 
   HttpRequest request;
+  
+  Map body;
 
-  Request(this.request);
+  Request(this.request, this.body);
 
-  get path => request.uri.path;
+  String get path => request.uri.path;
 
-  get headers => request.headers;
-
-  get json => request.transform(Utf8Decoder()).map(jsonDecode);
+  HttpHeaders get headers => request.headers;
 
 }

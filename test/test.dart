@@ -6,12 +6,12 @@ void main() {
     onBound: (port, addr) => print('Listening on ${addr}:${port}'),
   );
 
-  f.get('/test', (req, res) {
-
+  f(GET, '/test', (req, res) {
+    res.send('test');
   });
 
-  f.post('/test', (req, res) {
-
+  f(POST, '/test', (req, res) {
+    res.send(req.body);
   });
 
   f(PUT, '/test', (req, res) {

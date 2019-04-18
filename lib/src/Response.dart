@@ -13,6 +13,13 @@ class Response {
     return this;
   }
 
-  void send(dynamic content) => response..write(content)..close();
+  void send(dynamic content) {
+    if(content is Map) {
+      response.headers.set('Content-Type', 'application/json');
+      response..write(jsonEncode(content))..close();
+    } else {
+      response..write(content)..close();
+    }
+  }
 
 }

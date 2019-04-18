@@ -1,6 +1,6 @@
 part of flight;
 
-typedef RouteHandler = void Function(Request req, Response res1);
+typedef RouteHandler = Future<void> Function(Request req, Response res1);
 typedef BoundCallback = void Function(int port, String address);
 
 enum Verb {
@@ -28,23 +28,36 @@ class Flight {
     );
   }
 
+  _getRequestBody(HttpRequest request) async {
+    return request.contentLength > 0 && request.headers.contentType.value == ContentType.json.mimeType ?
+      jsonDecode(await request.transform(Utf8Decoder()).join()) as Map :
+      null;
+  }
+
   _serverBound(HttpServer server, BoundCallback onBound) async {
     if(onBound != null) onBound(server.port, server.address.address);
 
     await for (HttpRequest request in server) {
       var verb = this._getVerb(request.method);
-      var req = Request(request);
       var res = Response(request.response);
 
-      if(verb == null) {
-        res.send('Unsupported Verb');
+      if(request.contentLength != 0 && request.headers.contentType.value != ContentType.json.mimeType) {
+        res..status(422)..send({
+          'error': 'Only JSON bodies are allowed.'
+        });
       } else {
-        var verbRoutes = this._routes[verb];
+        var req = Request(request, await _getRequestBody(request));
 
-        if(!verbRoutes.containsKey(req.path)) {
-          res.status(404).send('Not found');
+        if(verb == null) {
+          res.send('Unsupported Verb');
         } else {
-          res.send(req.path);
+          var verbRoutes = this._routes[verb];
+
+          if(!verbRoutes.containsKey(req.path)) {
+            res.status(404).send('Not found');
+          } else {
+            verbRoutes[req.path](req, res);
+          }
         }
       }
     }
