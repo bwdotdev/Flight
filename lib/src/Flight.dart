@@ -24,11 +24,11 @@ class Flight {
     var listenOn = InternetAddress(address);
 
     HttpServer.bind(listenOn, port).then(
-      (server) => this._serverBound(server, onBound),
+      (server) => _serverBound(server, onBound),
     );
   }
 
-  _getRequestBody(HttpRequest request) async {
+  _getJSONBody(HttpRequest request) async {
     return request.contentLength > 0 && request.headers.contentType.value == ContentType.json.mimeType ?
       jsonDecode(await request.transform(Utf8Decoder()).join()) as Map :
       null;
@@ -38,26 +38,21 @@ class Flight {
     if(onBound != null) onBound(server.port, server.address.address);
 
     await for (HttpRequest request in server) {
-      var verb = this._getVerb(request.method);
+      var verb = _getVerb(request.method);
+      var req = Request(request);
       var res = Response(request.response);
 
-      if(request.contentLength != 0 && request.headers.contentType.value != ContentType.json.mimeType) {
-        res..status(422)..send({
-          'error': 'Only JSON bodies are allowed.'
-        });
+      req.body = await _getJSONBody(request);
+
+      if(verb == null) {
+        res.send('Unsupported Verb');
       } else {
-        var req = Request(request, await _getRequestBody(request));
+        var verbRoutes = _routes[verb];
 
-        if(verb == null) {
-          res.send('Unsupported Verb');
+        if(!verbRoutes.containsKey(req.path)) {
+          res.status(404).send('Not found');
         } else {
-          var verbRoutes = this._routes[verb];
-
-          if(!verbRoutes.containsKey(req.path)) {
-            res.status(404).send('Not found');
-          } else {
-            verbRoutes[req.path](req, res);
-          }
+          verbRoutes[req.path](req, res);
         }
       }
     }
@@ -74,30 +69,30 @@ class Flight {
   }
 
   call(Verb verb, String path, RouteHandler handler) {
-    if(verb == GET) return this.get(path, handler);
-    if(verb == POST) return this.post(path, handler);
-    if(verb == PUT) return this.put(path, handler);
-    if(verb == DELETE) return this.delete(path, handler);
+    if(verb == GET) return get(path, handler);
+    if(verb == POST) return post(path, handler);
+    if(verb == PUT) return put(path, handler);
+    if(verb == DELETE) return delete(path, handler);
   }
 
   get(String path, RouteHandler handler) {
-    this._registerRoute(GET, path, handler);
+    _registerRoute(GET, path, handler);
   }
 
   post(String path, RouteHandler handler) {
-    this._registerRoute(POST, path, handler);
+    _registerRoute(POST, path, handler);
   }
 
   put(String path, RouteHandler handler) {
-    this._registerRoute(PUT, path, handler);
+    _registerRoute(PUT, path, handler);
   }
 
   delete(String path, RouteHandler handler) {
-    this._registerRoute(DELETE, path, handler);
+    _registerRoute(DELETE, path, handler);
   }
 
   _registerRoute(Verb verb, String path, RouteHandler handler) {
-    this._routes[verb][path] = handler;
+    _routes[verb][path] = handler;
   }
 
 }

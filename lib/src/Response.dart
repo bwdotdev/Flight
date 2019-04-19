@@ -6,7 +6,13 @@ class Response {
 
   Response(this.response);
 
-  get headers => response.headers;
+  HttpHeaders get headers => response.headers;
+
+  String header(String name, [ String value, bool ifNotExists = false ]) {
+    if(value != null && (!ifNotExists || header(name) == null)) headers.set(name, value);
+
+    return headers.value(name);
+  }
 
   status(int status) {
     response.statusCode = status;
@@ -15,7 +21,7 @@ class Response {
 
   void send(dynamic content) {
     if(content is Map) {
-      response.headers.set('Content-Type', 'application/json');
+      header('Content-Type', 'application/json');
       response..write(jsonEncode(content))..close();
     } else {
       response..write(content)..close();
