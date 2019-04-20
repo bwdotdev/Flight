@@ -4,7 +4,9 @@ class Response {
 
   HttpResponse response;
 
-  Response(this.response);
+  Response(this.response) {
+    header('X-Powered-By', 'Flight (Dart)');
+  }
 
   HttpHeaders get headers => response.headers;
 
