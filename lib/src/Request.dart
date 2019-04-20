@@ -8,7 +8,7 @@ class Request {
 
   Request(this.request, [ this.body ]);
 
-  String get path => request.uri.path;
+  String get path => fixPath(request.uri.path);
 
   int get bodyLength => request.contentLength;
 

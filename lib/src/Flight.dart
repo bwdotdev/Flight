@@ -108,6 +108,8 @@ class Flight {
   }
 
   _registerRoute(Verb verb, String path, RouteHandler handler) {
+    path = fixPath(path);
+
     _routes[verb][path] = handler;
   }
 
