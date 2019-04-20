@@ -20,12 +20,28 @@ class Flight {
     DELETE: {},
   };
 
-  Flight({ int port = 3000, String address = '0.0.0.0', BoundCallback onBound }) {
+  Flight({
+    int port = 3000,
+    String address = '0.0.0.0',
+    BoundCallback onBound,
+    bool healthcheckEndpoint = true,
+  }) {
     var listenOn = InternetAddress(address);
+
+    if(healthcheckEndpoint) _registerHealthcheck();
 
     HttpServer.bind(listenOn, port).then(
       (server) => _serverBound(server, onBound),
     );
+  }
+
+  _registerHealthcheck() {
+    _registerRoute(GET, '/hc', (req, res) {
+      res.send({
+        'status': 'ALIVE',
+        'poweredBy': 'Flight',
+      });
+    });
   }
 
   _getJSONBody(HttpRequest request) async {
