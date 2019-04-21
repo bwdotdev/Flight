@@ -85,10 +85,7 @@ class Flight {
   }
 
   call(Verb verb, String path, RouteHandler handler) {
-    if(verb == GET) return get(path, handler);
-    if(verb == POST) return post(path, handler);
-    if(verb == PUT) return put(path, handler);
-    if(verb == DELETE) return delete(path, handler);
+    _registerRoute(verb, path, handler);
   }
 
   get(String path, RouteHandler handler) {
