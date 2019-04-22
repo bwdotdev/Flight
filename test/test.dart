@@ -19,8 +19,11 @@ void main() {
   });
 
   f.group('/group', [
-    f(GET, '/child', (req, res) {
-      res.send('grouping works');
+    f(GET, '/child-1', (req, res) {
+      res.send('child 1');
+    }),
+    f(GET, '/child-2', (req, res) {
+      res.send('child 2');
     })
   ]);
 
