@@ -13,7 +13,7 @@ const DELETE = Verb.DELETE;
 
 class Flight {
 
-  Map<Verb, Map<String, RouteHandler>> _routes = {
+  Map<Verb, Map<String, Route>> _routes = {
     GET: {},
     POST: {},
     PUT: {},
@@ -84,30 +84,24 @@ class Flight {
     return null;
   }
 
-  call(Verb verb, String path, RouteHandler handler) {
-    _registerRoute(verb, path, handler);
+  group(String base, List<Route> routes) {
+
   }
 
-  get(String path, RouteHandler handler) {
-    _registerRoute(GET, path, handler);
-  }
+  Route call(Verb verb, String path, RouteHandler handler) => _registerRoute(verb, path, handler);
 
-  post(String path, RouteHandler handler) {
-    _registerRoute(POST, path, handler);
-  }
+  Route get(String path, RouteHandler handler) => _registerRoute(GET, path, handler);
 
-  put(String path, RouteHandler handler) {
-    _registerRoute(PUT, path, handler);
-  }
+  Route post(String path, RouteHandler handler) => _registerRoute(POST, path, handler);
 
-  delete(String path, RouteHandler handler) {
-    _registerRoute(DELETE, path, handler);
-  }
+  Route put(String path, RouteHandler handler) => _registerRoute(PUT, path, handler);
 
-  _registerRoute(Verb verb, String path, RouteHandler handler) {
+  Route delete(String path, RouteHandler handler) => _registerRoute(DELETE, path, handler);
+
+  Route _registerRoute(Verb verb, String path, RouteHandler handler) {
     path = fixPath(path);
 
-    _routes[verb][path] = handler;
+    return _routes[verb][path] = Route(path, handler);
   }
 
 }

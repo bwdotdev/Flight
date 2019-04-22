@@ -8,3 +8,4 @@ import 'src/utils.dart';
 part 'src/Flight.dart';
 part 'src/Request.dart';
 part 'src/Response.dart';
+part 'src/Route.dart';

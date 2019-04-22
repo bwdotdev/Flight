@@ -18,4 +18,10 @@ void main() {
 
   });
 
+  f.group('/group', [
+    f(GET, '/child', (req, res) {
+      
+    })
+  ]);
+
 }
