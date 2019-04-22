@@ -74,18 +74,16 @@ class Flight {
     }
   }
 
-  Verb _getVerb(String verb) {
-    verb = verb.toUpperCase();
-    if(verb == 'GET') return GET;
-    if(verb == 'POST') return POST;
-    if(verb == 'PUT') return PUT;
-    if(verb == 'DELETE') return DELETE;
-
-    return null;
-  }
+  Verb _getVerb(String verb) => Verb.values.firstWhere((v) => v.toString() == 'Verb.' + verb);
 
   group(String base, List<Route> routes) {
+    base = fixPath(base);
 
+    routes.forEach((route) {
+      _routes[route.verb].remove(route.path);
+      route.path = base + route.path;
+      _routes[route.verb][route.path] = route;
+    });
   }
 
   Route call(Verb verb, String path, RouteHandler handler) => _registerRoute(verb, path, handler);
@@ -101,7 +99,7 @@ class Flight {
   Route _registerRoute(Verb verb, String path, RouteHandler handler) {
     path = fixPath(path);
 
-    return _routes[verb][path] = Route(path, handler);
+    return _routes[verb][path] = Route(verb, path, handler);
   }
 
 }
