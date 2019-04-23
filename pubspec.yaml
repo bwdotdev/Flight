@@ -1,10 +1,10 @@
 name: flight
 version: 0.0.1
 description: A modern, lightweight, extensible framework for creating rich APIs in Dart.
-author: BradW Ltd. <developers@bradw.io>
-homepage: https://github.com/BradW/Flight
-repository: https://github.com/BradW/Flight
-issue_tracker: https://github.com/BradW/Flight/issues
+author: Bradley Watton <mail@bradleyw.me>
+homepage: https://github.com/HypertextPP/Flight
+repository: https://github.com/HypertextPP/Flight
+issue_tracker: https://github.com/HypertextPP/Flight/issues
 
 environment:
   sdk: '>=2.2.0 <3.0.0'
