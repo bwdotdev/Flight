@@ -1,12 +1,11 @@
 part of flight;
 
 class Request {
-
   HttpRequest request;
-  
+
   Map body;
 
-  Request(this.request, [ this.body ]);
+  Request(this.request, [this.body]);
 
   String get path => fixPath(request.uri.path);
 
@@ -15,5 +14,4 @@ class Request {
   HttpHeaders get headers => request.headers;
 
   String header(String name) => headers.value(name);
-
 }

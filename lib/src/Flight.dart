@@ -4,7 +4,10 @@ typedef RouteHandler = Future<void> Function(Request req, Response res1);
 typedef BoundCallback = void Function(int port, String address);
 
 enum Verb {
-  GET, POST, PUT, DELETE,
+  GET,
+  POST,
+  PUT,
+  DELETE,
 }
 const GET = Verb.GET;
 const POST = Verb.POST;
@@ -12,7 +15,6 @@ const PUT = Verb.PUT;
 const DELETE = Verb.DELETE;
 
 class Flight {
-
   Map<Verb, Map<String, Route>> _routes = {
     GET: {},
     POST: {},
@@ -28,7 +30,7 @@ class Flight {
   }) {
     var listenOn = InternetAddress(address);
 
-    if(healthcheckEndpoint) _registerHealthcheck();
+    if (healthcheckEndpoint) _registerHealthcheck();
 
     HttpServer.bind(listenOn, port).then(
       (server) => _serverBound(server, onBound),
@@ -45,13 +47,14 @@ class Flight {
   }
 
   _getJSONBody(HttpRequest request) async {
-    return request.contentLength > 0 && request.headers.contentType.value == ContentType.json.mimeType ?
-      jsonDecode(await request.transform(Utf8Decoder()).join()) as Map :
-      null;
+    return request.contentLength > 0 &&
+            request.headers.contentType.value == ContentType.json.mimeType
+        ? jsonDecode(await request.transform(Utf8Decoder()).join()) as Map
+        : null;
   }
 
   _serverBound(HttpServer server, BoundCallback onBound) async {
-    if(onBound != null) onBound(server.port, server.address.address);
+    if (onBound != null) onBound(server.port, server.address.address);
 
     await for (HttpRequest request in server) {
       var verb = _getVerb(request.method);
@@ -60,12 +63,12 @@ class Flight {
 
       req.body = await _getJSONBody(request);
 
-      if(verb == null) {
+      if (verb == null) {
         res.send('Unsupported Verb');
       } else {
         var verbRoutes = _routes[verb];
 
-        if(!verbRoutes.containsKey(req.path)) {
+        if (!verbRoutes.containsKey(req.path)) {
           res.status(404).send('Not found');
         } else {
           verbRoutes[req.path](req, res);
@@ -74,7 +77,8 @@ class Flight {
     }
   }
 
-  Verb _getVerb(String verb) => Verb.values.firstWhere((v) => v.toString() == 'Verb.' + verb);
+  Verb _getVerb(String verb) =>
+      Verb.values.firstWhere((v) => v.toString() == 'Verb.' + verb);
 
   group(String base, List<Route> routes) {
     base = fixPath(base);
@@ -86,20 +90,24 @@ class Flight {
     });
   }
 
-  Route call(Verb verb, String path, RouteHandler handler) => _registerRoute(verb, path, handler);
+  Route call(Verb verb, String path, RouteHandler handler) =>
+      _registerRoute(verb, path, handler);
 
-  Route get(String path, RouteHandler handler) => _registerRoute(GET, path, handler);
+  Route get(String path, RouteHandler handler) =>
+      _registerRoute(GET, path, handler);
 
-  Route post(String path, RouteHandler handler) => _registerRoute(POST, path, handler);
+  Route post(String path, RouteHandler handler) =>
+      _registerRoute(POST, path, handler);
 
-  Route put(String path, RouteHandler handler) => _registerRoute(PUT, path, handler);
+  Route put(String path, RouteHandler handler) =>
+      _registerRoute(PUT, path, handler);
 
-  Route delete(String path, RouteHandler handler) => _registerRoute(DELETE, path, handler);
+  Route delete(String path, RouteHandler handler) =>
+      _registerRoute(DELETE, path, handler);
 
   Route _registerRoute(Verb verb, String path, RouteHandler handler) {
     path = fixPath(path);
 
     return _routes[verb][path] = Route(verb, path, handler);
   }
-
 }
