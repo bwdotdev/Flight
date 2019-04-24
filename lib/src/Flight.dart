@@ -47,20 +47,13 @@ class Flight {
   }
 
   Future<Map<String, dynamic>> _getBody(HttpRequest request) async {
-    var contentType = request.headers.contentType.value;
-
-    if (request.contentLength < 1) {
-      return {};
-    } else if (contentType == 'application/json') {
-      String body = await request.transform(Utf8Decoder()).join();
-      return jsonDecode(body);
-    } else if (contentType == 'application/x-www-form-urlencoded') {
-      String body = await request.transform(Utf8Decoder()).join();
-      return Uri.splitQueryString(body);
-    } else {
-      print('Unhandled Content-Type: ${contentType}');
-      return {};
-    }
+    return (await parseBodyFromStream(
+            request,
+            request.headers.contentType != null
+                ? new MediaType.parse(request.headers.contentType.toString())
+                : null,
+            request.uri))
+        .body;
   }
 
   _serverBound(HttpServer server, BoundCallback onBound) async {
