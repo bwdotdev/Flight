@@ -46,11 +46,21 @@ class Flight {
     });
   }
 
-  _getJSONBody(HttpRequest request) async {
-    return request.contentLength > 0 &&
-            request.headers.contentType.value == ContentType.json.mimeType
-        ? jsonDecode(await request.transform(Utf8Decoder()).join()) as Map
-        : null;
+  Future<Map<String, dynamic>> _getBody(HttpRequest request) async {
+    var contentType = request.headers.contentType.value;
+
+    if (request.contentLength < 1) {
+      return {};
+    } else if (contentType == 'application/json') {
+      String body = await request.transform(Utf8Decoder()).join();
+      return jsonDecode(body);
+    } else if (contentType == 'application/x-www-form-urlencoded') {
+      String body = await request.transform(Utf8Decoder()).join();
+      return Uri.splitQueryString(body);
+    } else {
+      print('Unhandled Content-Type: ${contentType}');
+      return {};
+    }
   }
 
   _serverBound(HttpServer server, BoundCallback onBound) async {
@@ -61,7 +71,7 @@ class Flight {
       var req = Request(request);
       var res = Response(request.response);
 
-      req.body = await _getJSONBody(request);
+      req.body = await _getBody(request);
 
       if (verb == null) {
         res.send('Unsupported Verb');
