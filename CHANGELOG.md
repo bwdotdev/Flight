@@ -1,3 +1,8 @@
+## 0.0.3
+
+- Added onPreRoute
+- Added onPostRoute
+
 ## 0.0.2
 
 - Added CHANGELOG

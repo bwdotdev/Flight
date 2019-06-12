@@ -22,15 +22,23 @@ class Flight {
     DELETE: {},
   };
 
+  RouteHandler _onPreRoute;
+  RouteHandler _onPostRoute;
+
   Flight({
     int port = 3000,
     String address = '0.0.0.0',
     BoundCallback onBound,
+    RouteHandler onPreRoute,
+    RouteHandler onPostRoute,
     bool healthcheckEndpoint = true,
   }) {
     var listenOn = InternetAddress(address);
 
     if (healthcheckEndpoint) _registerHealthcheck();
+
+    if (onPreRoute != null) this._onPreRoute = onPreRoute;
+    if (onPostRoute != null) this._onPostRoute = onPostRoute;
 
     HttpServer.bind(listenOn, port).then(
       (server) => _serverBound(server, onBound),
@@ -42,6 +50,7 @@ class Flight {
       res.send({
         'status': 'ALIVE',
         'poweredBy': 'Flight',
+        'test': true,
       });
     });
   }
@@ -74,7 +83,11 @@ class Flight {
         if (!verbRoutes.containsKey(req.path)) {
           res.status(404).send('Not found');
         } else {
+          if (_onPreRoute != null) await _onPreRoute(req, res);
           verbRoutes[req.path](req, res);
+          if (_onPreRoute != null && !res.ended) await _onPreRoute(req, res);
+
+          res.end();
         }
       }
     }

@@ -2,6 +2,7 @@ part of flight;
 
 class Response {
   HttpResponse response;
+  bool ended = false;
 
   Response(this.response) {
     header('X-Powered-By', 'Flight (Dart)');
@@ -27,10 +28,17 @@ class Response {
       response
         ..write(jsonEncode(content))
         ..close();
+    } else if (content is Stream) {
+      content.pipe(response).then((_) => response.close());
     } else {
       response
         ..write(content)
         ..close();
     }
+  }
+
+  void end() {
+    response.close();
+    ended = true;
   }
 }

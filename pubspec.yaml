@@ -1,5 +1,5 @@
 name: flight
-version: 0.0.2
+version: 0.0.3
 description: A modern, lightweight, extensible framework for creating rich APIs in Dart.
 author: Bradley Watton <mail@bradleyw.me>
 homepage: https://github.com/HypertextPP/Flight
