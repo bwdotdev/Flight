@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Fixed onPreRoute / onPostRoute bug
+
 ## 0.0.3
 
 - Added onPreRoute

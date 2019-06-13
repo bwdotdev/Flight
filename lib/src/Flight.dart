@@ -85,7 +85,7 @@ class Flight {
         } else {
           if (_onPreRoute != null) await _onPreRoute(req, res);
           verbRoutes[req.path](req, res);
-          if (_onPreRoute != null && !res.ended) await _onPreRoute(req, res);
+          if (_onPostRoute != null && !res.ended) await _onPostRoute(req, res);
 
           res.end();
         }
