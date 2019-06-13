@@ -1,6 +1,7 @@
 ## 0.0.4
 
 - Fixed onPreRoute / onPostRoute bug
+- Fixed missing braces in Response.dart
 
 ## 0.0.3
 

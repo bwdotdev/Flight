@@ -11,8 +11,9 @@ class Response {
   HttpHeaders get headers => response.headers;
 
   String header(String name, [String value, bool ifNotExists = false]) {
-    if (value != null && (!ifNotExists || header(name) == null))
+    if (value != null && (!ifNotExists || header(name) == null)) {
       headers.set(name, value);
+    }
 
     return headers.value(name);
   }
